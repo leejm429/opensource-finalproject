@@ -11,7 +11,7 @@ WINDOW_SIZE = 20      # 모델이 학습된 프레임 창 크기
 CONF_THRESH = 0.3
 BASE_DIR    = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR   = os.path.join(BASE_DIR, '../models')
-CURRENT_LABEL = "커피" # 현재 보강하려 하는 단어
+CURRENT_LABEL = "경찰서" # 현재 보강하려 하는 단어
 
 # ==== 모델 및 메타데이터 로드 ====
 model         = load_model(os.path.join(MODEL_DIR, 'sign_language_model_normalized.h5'))
