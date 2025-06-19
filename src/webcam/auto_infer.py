@@ -13,7 +13,7 @@ from tensorflow.keras.models import load_model
 parser = argparse.ArgumentParser(
     description="Sign2Text 자동 모드 (영상 끝나고 한 번에 예측)"
 )
-parser.add_argument('video_name', help="videos/ 폴더의 파일명 (예: demo.mp4)")
+parser.add_argument('video_name', nargs='?', default='일상생활_수어_사회생활_경찰서.mkv', help="videos/ 폴더의 파일명 (예: demo.mp4). 기본값: demo.mp4")
 parser.add_argument('--seq',   default='L20', help="윈도우 시퀀스 (기본 L20)")
 parser.add_argument('--conf',  type=float, default=0.3,  help="신뢰도 문턱값")
 parser.add_argument('--temp',  type=float, default=2.5,  help="온도 스케일링 T")
@@ -33,6 +33,21 @@ label_classes = np.load(os.path.join(MODEL_DIR, 'label_classes.npy'), allow_pick
 X_mean        = np.load(os.path.join(MODEL_DIR, 'X_mean.npy'))
 X_std         = np.load(os.path.join(MODEL_DIR, 'X_std.npy'))
 id2label      = {i: lbl for i, lbl in enumerate(label_classes)}
+
+# ─ 비디오 파일 탐색 ────────────────────────────────────────────────────────────
+VIDEOS_DIR = os.path.join(BASE_DIR, 'videos')
+name, ext = os.path.splitext(args.video_name)
+if ext.lower() in ('.mp4', '.mkv'):
+    video_file = os.path.join(VIDEOS_DIR, args.video_name)
+else:
+    # 확장자 미지정 시 .mp4 → .mkv 순으로 시도
+    if os.path.exists(os.path.join(VIDEOS_DIR, name + '.mp4')):
+        video_file = os.path.join(VIDEOS_DIR, name + '.mp4')
+    elif os.path.exists(os.path.join(VIDEOS_DIR, name + '.mkv')):
+        video_file = os.path.join(VIDEOS_DIR, name + '.mkv')
+    else:
+        print(f"❌ 비디오 파일이 존재하지 않습니다: {args.video_name}")
+        exit(1)
 
 # ─ MediaPipe 손 검출 세팅 ──────────────────────────────────────────────────────
 mp_hands   = mp.solutions.hands
